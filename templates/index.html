@@ -1,5 +1,10 @@
-{% extends layout.html %}
+{% extends 'layout.html' %}
 
 {% block content %}
-{{text}}
+{% if current_user.is_authenticated %}
+<h1>How are you doing today, {{current_user.username}}?</h1>
+{% else%}
+<h1>Howdy</h1>
+{% endif %}
+
 {% endblock %}

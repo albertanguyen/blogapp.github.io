@@ -28,6 +28,24 @@ migrate = Migrate(app, db)
 # After everytime the model is updated, sync model and physical db my running flask upgrade
 # -----------------------
 class User(db.Model):
+        """ 
+    Class Argument: Inherit the baseclasss db.Model
+    Private vars: 
+        __id 
+        __username
+        __email
+        __password
+    (Public) functions: 
+        __repr__ (representation)
+        set_password
+        check_password 
+    Note: Any changes happens with the db,
+        sync the db and run the changes by the following commands (type in terminal):
+        $ flask db init
+        $ flask db migrate
+        $ flask db upgrade
+    """
+
     __id = db.Column(db.Integer, primary_key=True)
     __username = db.Column(db.String(80), unique=True, nullable=False)
     __email = db.Column(db.String(255), unique=True, nullable=False)
@@ -59,8 +77,17 @@ db.create_all()
 #---------------------
 class Registration(FlaskForm):
     """
-    In: Inherite FlaskForm syntax, command to create a form
-    Out:
+    Class Argument: Inherit classbase FlaskForm
+    Local vars: 
+        username
+        email
+        password
+        pass
+        confirm
+        submit
+    (Public) functions:
+        validate_username 
+        validate_email   
     """
     username = StringField("User Name", validators=[DataRequired(), Length(min=3, max=79)])
     email = StringField("Email", validators=[DataRequired(), Length(max=254)])
@@ -88,9 +115,18 @@ class Registration(FlaskForm):
 
 
 class login_Form(FlaskForm):
-    """
-    In: 
-    Out:
+    """ 
+    Class Argument: Inherit classbase FlaskForm
+    How to log in either username of email and exclude confirm password field? 
+        Local vars: 
+        username
+        email
+        password
+        pass
+        confirm
+        submit
+    (Public) functions:
+
     """
     email = StringField("Email", validators=[DataRequired(), Length(max=254)])
     password = PasswordField("Password", validators=[DataRequired(), EqualTo('pass_confirm')])
@@ -174,7 +210,8 @@ def logout():
 
 @app.route('/welcome')
 def welcome():
-    return render_template('welcome.html')   
+    
+    return render_template('welcome.html', )   
 
 @app.route('/message')
 def Message():

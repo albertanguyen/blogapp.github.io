@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, ValidationError
 from wtforms.validators import EqualTo, Length, DataRequired, Email
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, login_required, logout_user, LoginManager, UserMixin
+from flask_login import login_user, login_required, logout_user, LoginManager, UserMixin, current_user
 
 
 
@@ -22,12 +22,12 @@ login_manager = LoginManager(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.get(user_id) # Fetch the user from the database
+    return User.query.get(user_id) # Fetch the user from the database
 
 # -----------------------
 # Define model here
 # -----------------------
-class User(db.Model):
+class User(UserMixin, db.Model):
     """ 
     Class Argument: Inherit the baseclasss db.Model
     Private vars: 
@@ -41,34 +41,29 @@ class User(db.Model):
         check_password 
     Note: Any changes happens with the db,
         sync the db and run the changes by the following commands (type in terminal):
-        python <your app>.py db init
-        $ python <your app>.py db migrate
-        $ python <your app>.py db upgrade
+        $ flask db init
+        $ flask db migrate
+        $ flask db upgrade
     """
-    __id = db.Column(db.Integer, primary_key=True)
-    __username = db.Column(db.String(80), unique=True, nullable=False)
-    __email = db.Column(db.String(255), unique=True, nullable=False)
-    __password = db.Column(db.String(256), nullable=False)
-
-    def __init__(self, username, email, password='', *arg):
-        self.__username = username
-        self.__email = email
-        self.__password = password
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password = db.Column(db.String(256), nullable=False)
 
     def __repr__(self):
-        return '<User {}>'.format(self.__username)
+        return '<User {}>'.format(self.username)
 
     # def add_column():
     #     """append new column"""
     #     pass
 
     def set_password(self, password):
-        self.__password = generate_password_hash(password)
+        self.password = generate_password_hash(password)
 
 
 
     def check_password(self, password):
-        return check_password_hash(self.__password, password)
+        return check_password_hash(self.password, password)
 
 
 db.create_all()
@@ -113,11 +108,11 @@ class Registration(FlaskForm):
         query.filter_by (or query.filter) use column name to communicat w/ the db
 
         """
-        if User.query.filter_by(_User__username = field.data).first():
+        if User.query.filter_by(username = field.data).first():
             raise ValidationError('You already registered with this username')
 
     def validate_email(self, field):
-        if User.query.filter_by(_User__email = field.data).first():
+        if User.query.filter_by(email = field.data).first():
             raise ValidationError('You already used this email to register')
 
 
@@ -135,14 +130,14 @@ class LoginForm(FlaskForm):
     (Public) functions:
 
     """
-    email = StringField("Email", validators=[DataRequired(), Length(max=254)])
-    password = PasswordField("Password", validators=[DataRequired(), EqualTo('pass_confirm')])
-    pass_confirm = PasswordField("Confirm Password", validators=[DataRequired()])
+    username_email = StringField("username_email", validators=[Length(max=254)])
+    password = PasswordField("Password", validators=[DataRequired()])
+    
     submit = SubmitField("Register")
 
-    def validate_email(self, field):
-        if User.query.filter_by(_User__email = field.data).first():
-            raise ValidationError('Please make sure you type the correct email used to register for this blog')
+    # def validate_email(self, field):
+        # if User.query.filter_by(email = field.data).first():
+            # raise ValidationError('Please make sure you type the correct email used to register for this blog')
 
 
 # -----------------------
@@ -151,8 +146,12 @@ class LoginForm(FlaskForm):
 
 @app.route('/') # Default at: https://localhost:5000
 def index():
-    text = 'Howdy!'
-    return render_template('index.html', text = text)
+    return render_template('index.html')
+
+@app.route('/') # Default at: https://localhost:5000
+def index():
+    return render_template('index.html')
+
 
 @app.route('/list_user')
 def list_user():
@@ -175,17 +174,21 @@ def register_user():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        log_user = User.query.filter_by(email=form.email.data).first()
+        log_user = User.query.filter_by(email=form.username_email.data).first()
         if log_user is None:
-            return redirect(url_for('register_user'))
+            log_user = User.query.filter_by(username=form.username_email.data).first()
+            if log_user is None:
+                return redirect(url_for('register_user'))
 
         if not log_user.check_password(form.password.data):
             return render_template('login.html', form=form)
 
         login_user(log_user)
-
+        # flash('You were successfully logged in')
         return redirect(url_for('welcome'))
     return render_template('login.html', form=form)
 
@@ -195,6 +198,11 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+@app.route('/welcome')
+def welcome():
+    return render_template('welcome.html')   
+
 
 @app.route('/message')
 def Message():

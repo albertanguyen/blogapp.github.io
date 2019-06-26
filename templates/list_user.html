@@ -10,7 +10,7 @@
 {% block content %}
   <p class="important">This is a list of users</p>
     {% for user in users %}
-    <li>User: {{user._User__username}} has the email address {{user._User__email}}</li>
+    <li>User: {{user.username}} has the email address {{user.email}}</li>
     {% endfor %}  
   
 
