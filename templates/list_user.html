@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+  <style type="text/css">
+    .important { color: #336699; }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <p class="important">This is a list of users</p>
+    {% for user in users %}
+    <li>User: {{user._User__username}} has the email address {{user._User__email}}</li>
+    {% endfor %}  
+  
+
+{% endblock content %}
