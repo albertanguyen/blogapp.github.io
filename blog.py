@@ -30,17 +30,17 @@ def load_user(user_id):
 class User(UserMixin, db.Model):
     """ 
     Class Argument: Inherit the baseclasss db.Model
-    Private vars: 
-        __id 
-        __username
-        __email
-        __password
+    Local vars: 
+        id 
+        username
+        email
+        password
     (Public) functions: 
         __repr__ (representation)
         set_password
         check_password 
     Note: Any changes happens with the db,
-        sync the db and run the changes by the following commands (type in terminal):
+        sync the db by the following commands (type in terminal):
         $ flask db init
         $ flask db migrate
         $ flask db upgrade
@@ -53,9 +53,9 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
-    # def add_column():
-    #     """append new column"""
-    #     pass
+    def add_column(col_title, col_type, *args):
+        """append new column to db"""
+        return db.Column(db.col_type)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
