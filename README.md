@@ -30,7 +30,7 @@ THE USER is
 * Using <a href="https://pypi.org/">this site</a> to check the latest version of all dependencies
 
 ## Describe any challenges encountered while building the app (retrived several of my google queries).
-* Cannot create different python version or switch between python version in <code>venv</code>. It is impossible since to first create a virtual environment, we had to specify the python version. Somehow along the way, I have overidden python 3.x to python 2.x. Also in <a href="https://stackoverflow.com/questions/22681824/how-do-i-use-different-python-version-in-venv-from-standard-library-not-virtua">this answer</a>, they suggested pyenv to handle dependency version in python.
+* Cannot create different python version or switch between python version in <code>venv</code>. It is impossible since to first create a virtual environment, we had to specify the python version. Somehow along the way, I have overidden python 3.x to python 2.x. As a side note, in <a href="https://stackoverflow.com/questions/22681824/how-do-i-use-different-python-version-in-venv-from-standard-library-not-virtua">this answer</a>, they suggest using pyenv to handle dependency version in python.
 * We would have to delete the whole table db and migration directory if we created a new column (decided to change the database structure) after already running it.
 * Need to setup <code>requirements.txt</code> file because I screwed up python version in venv meaning I need to delete the old one, create new one  and install all dependecies via <code>pip install -r requirements.txt</code>. For more information, please refer to <a href="https://devcenter.heroku.com/articles/python-pip">this link</a>.
 
